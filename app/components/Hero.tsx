@@ -1,6 +1,40 @@
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
 
-const Hero = () => {
+const Hero: React.FC = () => {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        department: '',
+        time: ''
+    });
+
+    const savedData = localStorage.getItem('appointmentData');
+    const savedTime = savedData ? JSON.parse(savedData).time : null;
+
+    const availableTimes = ['8:00', '10:00', '2:00', '4:00', '5:00', '6:00'].filter(time => time !== savedTime);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        // guarda los datos en localStorage
+        localStorage.setItem('appointmentData', JSON.stringify(formData));
+        setFormData({
+            name: '',
+            email: '',
+            department: '',
+            time: ''
+        });
+        alert('Datos guardados en localStorage');
+    };
+
     return (
         <header className="bg-cover bg-center" style={{ backgroundImage: "url('landing/cover1-main.svg')" }}>
             <div className="container mx-auto flex justify-between items-center py-4 px-8">
@@ -28,40 +62,69 @@ const Hero = () => {
                         <p className="text-gray-600 mt-4">
                             We know how large objects will act, but things on a small scale.
                         </p>
-                        <div className="mt-6 space-x-4">
-                            <button className="bg-brown-600 text-white px-6 py-2 rounded-3xl" style={{ backgroundColor: '#784F33' }}>
+                        <div className="mt-6 space-y-4 sm:space-y-0 sm:space-x-4">
+                            <button className="bg-[#784F33] text-white px-6 py-2 rounded-3xl w-full sm:w-auto">
                                 Get Quote Now
                             </button>
-                            <button className="border text-brown-600 px-6 py-2 rounded-3xl" style={{ border: 'solid 1px #784F33' }}>
+                            <button className="border text-brown-600 px-6 py-2 rounded-3xl w-full sm:w-auto" style={{ border: 'solid 1px #784F33' }}>
                                 Learn More
                             </button>
                         </div>
                     </div>
-                    <div className="bg-white shadow-lg rounded-lg p-6 md:w-1/3 mt-8 md:mt-0 max-w-xs">
+                    <div className="bg-white shadow-lg rounded-lg p-6 md:w-1/3 mt-8 md:mt-0 max-w-full md:max-w-xs">
                         <h2 className="text-2xl font-semibold text-gray-800 mb-4 py-4">Book Appointment</h2>
-                        <form>
+                        <form onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <label className="block text-gray-700">Name*</label>
-                                <input type="text" placeholder="Full Name"
-                                       className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brown-600"/>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder="Full Name"
+                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brown-600"
+                                    required
+                                />
                             </div>
                             <div className="mb-4">
                                 <label className="block text-gray-700">Email*</label>
-                                <input type="email" placeholder="example@gmail.com"
-                                       className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brown-600"/>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    placeholder="example@gmail.com"
+                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brown-600"
+                                    required
+                                />
                             </div>
                             <div className="mb-4">
                                 <label className="block text-gray-700">Department*</label>
                                 <select
-                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brown-600">
-                                    <option>Please Select</option>
+                                    name="department"
+                                    value={formData.department}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brown-600"
+                                    required
+                                >
+                                    <option value="">Please Select</option>
+                                    <option value="legal">Legal</option>
+                                    <option value="financial">Financial</option>
+                                    <option value="consulting">Consulting</option>
                                 </select>
                             </div>
                             <div className="mb-4">
                                 <label className="block text-gray-700">Time*</label>
                                 <select
-                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brown-600">
-                                    <option>4:00 Available</option>
+                                    name="time"
+                                    value={formData.time}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brown-600"
+                                    required
+                                >
+                                    {availableTimes.map(time => (
+                                        <option key={time} value={time}>{time} Available</option>
+                                    ))}
                                 </select>
                             </div>
                             <button className="bg-brown-600 text-white w-full py-4 rounded-md" style={{ backgroundColor: '#295C7A' }}>Book Appointment</button>
