@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 const Hero: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -9,8 +9,18 @@ const Hero: React.FC = () => {
         time: ''
     });
 
-    const savedData = localStorage.getItem('appointmentData');
-    const savedTime = savedData ? JSON.parse(savedData).time : null;
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [savedTime, setSavedTime] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const savedData = localStorage.getItem('appointmentData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                setSavedTime(parsedData.time);
+            }
+        }
+    }, []);
 
     const availableTimes = ['8:00', '10:00', '2:00', '4:00', '5:00', '6:00'].filter(time => time !== savedTime);
 
@@ -35,6 +45,10 @@ const Hero: React.FC = () => {
         alert('Datos guardados en localStorage');
     };
 
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
     return (
         <header className="bg-cover bg-center" style={{ backgroundImage: "url('landing/cover1-main.svg')" }}>
             <div className="container mx-auto flex justify-between items-center py-4 px-8">
@@ -45,13 +59,24 @@ const Hero: React.FC = () => {
                     <a href="#pricing" className="hover:text-gray-800">Pricing</a>
                     <a href="#contact" className="hover:text-gray-800">Contact</a>
                 </nav>
-                <button className="md:hidden flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor">
+                <button onClick={toggleMenu} className="md:hidden flex items-center z-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"/>
                     </svg>
                 </button>
             </div>
+
+            {/* Menú móvil */}
+            {isMenuOpen && (
+                <nav className="md:hidden absolute top-0 left-0 w-full h-1/3 bg-white shadow-md p-4 rounded-lg mt-4">
+                    <ul className="space-y-4 text-center">
+                        <li><a href="#home" className="text-gray-800 hover:text-gray-600">Home</a></li>
+                        <li><a href="#product" className="text-gray-800 hover:text-gray-600">Product</a></li>
+                        <li><a href="#pricing" className="text-gray-800 hover:text-gray-600">Pricing</a></li>
+                        <li><a href="#contact" className="text-gray-800 hover:text-gray-600">Contact</a></li>
+                    </ul>
+                </nav>
+            )}
 
             <section>
                 <div className="container mx-auto flex flex-col md:flex-row items-center justify-between py-12 px-8">
